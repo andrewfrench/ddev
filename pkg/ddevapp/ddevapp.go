@@ -902,6 +902,13 @@ func (app *DdevApp) Down(removeData bool) error {
 			}
 			util.Success("Project data/database removed")
 		}
+
+		// Remove hostname from hosts file
+		if err := app.RemoveHostsEntries(); err != nil {
+			return fmt.Errorf("unable to remove host entries: %v", err)
+		}
+
+		util.Success("Project hosts removed")
 	}
 
 	err = StopRouterIfNoContainers()
@@ -971,7 +978,7 @@ func (app *DdevApp) HostName() string {
 	return app.GetHostname()
 }
 
-// AddHostsEntries will add the site URL to the host's /etc/hosts.
+// AddHostsEntries will add the site URL to the host's /etc/hosts (or equivalent).
 func (app *DdevApp) AddHostsEntries() error {
 	dockerIP, err := dockerutil.GetDockerIP()
 	if err != nil {
@@ -980,7 +987,7 @@ func (app *DdevApp) AddHostsEntries() error {
 
 	hosts, err := goodhosts.NewHosts()
 	if err != nil {
-		util.Failed("could not open hostfile. %s", err)
+		util.Failed("could not open hosts file: %v", err)
 	}
 	for _, name := range app.GetHostnames() {
 
@@ -1008,6 +1015,40 @@ func (app *DdevApp) AddHostsEntries() error {
 			util.Warning("Failed to execute sudo command, you will need to manually execute '%s' with administrative privileges", command)
 		}
 	}
+	return nil
+}
+
+// RemoveHostsEntries will remote the site URL from the host's /etc/hosts (or equivalent).
+func (app *DdevApp) RemoveHostsEntries() error {
+	dockerIP, err := dockerutil.GetDockerIP()
+	if err != nil {
+		return fmt.Errorf("could not get Docker IP: %v", err)
+	}
+
+	hosts, err := goodhosts.NewHosts()
+	if err != nil {
+		return fmt.Errorf("could not open hosts file: %v", err)
+	}
+
+	ddevFullPath, err := os.Executable()
+	util.CheckErr(err)
+
+	for _, name := range app.GetHostnames() {
+		if !hosts.Has(dockerIP, name) {
+			continue
+		}
+
+		output.UserOut.Printf("ddev needs to remove an entry to your hostfile.\nIt will require administrative privileges via the sudo command, so you may be required\nto enter your password for sudo. ddev is about to issue the command:")
+
+		hostnameArgs := []string{ddevFullPath, "hostname", name, dockerIP}
+		command := strings.Join(hostnameArgs, " ")
+		util.Warning(fmt.Sprintf("    sudo %s", command))
+		output.UserOut.Println("Please enter your password if prompted.")
+		if _, err := exec.RunCommandPipe("sudo", hostnameArgs); err != nil {
+			util.Warning("Failed to execute sudo command, you will need to manually execute '%s' with administrative privileges", command)
+		}
+	}
+
 	return nil
 }
 
