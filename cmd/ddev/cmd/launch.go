@@ -65,7 +65,7 @@ func getBrowserCommand() (string, error) {
 	case "darwin":
 		return "open", nil
 
-	case "win32":
+	case "windows":
 		return "start", nil
 
 	default:
