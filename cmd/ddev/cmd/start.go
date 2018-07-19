@@ -48,6 +48,6 @@ running 'ddev start [projectname ...]'`,
 }
 
 func init() {
-	StartCmd.Flags().BoolVarP(&startAll, "all", "a", false, "Start all stopped sites")
+	StartCmd.Flags().BoolVarP(&startAll, "all", "a", false, "Start all stopped projects")
 	RootCmd.AddCommand(StartCmd)
 }
