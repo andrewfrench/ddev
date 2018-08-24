@@ -413,11 +413,11 @@ rfay@rfay-mbp-2017:~/workspace/d8git$ ddev restore-snapshot d8git_20180801132403
 $ ddev restore-snapshot d8git_20180801132403
 ...
 Restored database snapshot: /Users/rfay/workspace/d8git/.ddev/db_snapshots/d8git_20180801132403
-
 ```
 
 Snapshots are stored in the project's .ddev/db_snapshots directory, and the directory can be renamed as necessary. For example, if you rename the above d8git_20180801132403 directory to "working_before_migration", then you can use `ddev restore-snapshot working_before_migration`.
 
+Snapshotting requires your project to be in a running state. If your project isn't currently running, `ddev` will attempt to start it before taking the snapshot. To bypass the snapshotting process on `ddev remove --remove-data`, provide the `--omit-snapshot` flag.
 
 ## Interacting with your project
 ddev provides several commands to facilitate interacting with your project in the development environment. These commands can be run within the working directory of your project while the project is running in ddev.
