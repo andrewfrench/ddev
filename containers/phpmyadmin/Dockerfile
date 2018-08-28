@@ -1,4 +1,4 @@
-FROM phpmyadmin/phpmyadmin:4.7.4-1
+FROM phpmyadmin/phpmyadmin:4.8.3
 
 RUN apk add --no-cache curl curl-dev bash vim
 
