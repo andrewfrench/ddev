@@ -35,3 +35,4 @@ sudo apt-get install -qq docker-ce
 
 # Install ghr
 go get -u github.com/tcnksm/ghr
+ghr -v

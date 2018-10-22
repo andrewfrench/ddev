@@ -15,14 +15,14 @@ export VERSION=$(git describe --tags --always --dirty)
 
 # Make sure we have all our docker images, and save them in a tarball
 $BASE_DIR/bin/linux/ddev version | awk '/drud\// {print $2;}' >/tmp/images.txt
-for item in $(cat /tmp/images.txt); do
-  docker pull $item
-done
-docker save -o $ARTIFACTS/ddev_docker_images.$VERSION.tar $(cat /tmp/images.txt)
-gzip --keep $ARTIFACTS/ddev_docker_images.$VERSION.tar
-if [ ! -z "$BUILD_XZ" ] ; then
-    xz $ARTIFACTS/ddev_docker_images.$VERSION.tar
-fi
+# for item in $(cat /tmp/images.txt); do
+#   docker pull $item
+# done
+# docker save -o $ARTIFACTS/ddev_docker_images.$VERSION.tar $(cat /tmp/images.txt)
+# gzip --keep $ARTIFACTS/ddev_docker_images.$VERSION.tar
+# if [ ! -z "$BUILD_XZ" ] ; then
+#     xz $ARTIFACTS/ddev_docker_images.$VERSION.tar
+# fi
 
 # Generate and place extra items like autocomplete
 bin/linux/ddev_gen_autocomplete
