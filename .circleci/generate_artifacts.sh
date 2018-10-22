@@ -53,4 +53,4 @@ for item in *.*; do
 done
 
 # Upload artifacts to Github release
-/home/circleci/go/bin/ghr -draft -prerelease -r $GITHUB_REPOSITORY -u $GITHUB_USERNAME -t $GITHUB_TOKEN -n $VERSION -b $(cat .circleci/release-notes.md) $VERSION $ARTIFACTS
+/home/circleci/go/bin/ghr -draft -prerelease -r $GITHUB_REPOSITORY -u $GITHUB_USERNAME -t $GITHUB_TOKEN -n $VERSION -b "$(cat .circleci/release-notes.md)" $VERSION $ARTIFACTS
