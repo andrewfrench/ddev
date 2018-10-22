@@ -34,6 +34,6 @@ sudo apt-get update -qq
 sudo apt-get install -qq docker-ce
 
 # Install ghr
-export PATH=$PATH:/usr/local/go/bin
+export PATH=$PATH:~/go/bin
 go get -u -v github.com/tcnksm/ghr
 ghr -v
