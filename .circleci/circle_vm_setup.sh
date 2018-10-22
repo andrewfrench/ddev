@@ -37,3 +37,5 @@ sudo apt-get install -qq docker-ce
 export PATH=$PATH:~/go/bin
 go get -u -v github.com/tcnksm/ghr
 ghr -v
+pwd
+echo ~
