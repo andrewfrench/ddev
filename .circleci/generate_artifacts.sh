@@ -53,4 +53,4 @@ for item in *.*; do
 done
 
 printenv
-/home/circleci/go/bin/ghr -draft -u $GITHUB_USERNAME -t $GITHUB_TOKEN -n $VERSION $VERSION $ARTIFACTS
+/home/circleci/go/bin/ghr -draft -r $GITHUB_REPOSITORY -u $GITHUB_USERNAME -t $GITHUB_TOKEN -n $VERSION $VERSION $ARTIFACTS
