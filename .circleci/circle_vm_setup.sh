@@ -35,4 +35,4 @@ sudo apt-get install -qq docker-ce
 
 # Install ghr
 go get -u -v github.com/tcnksm/ghr
-ghr -v
+/home/circleci/go/bin/ghr -v
