@@ -13,7 +13,6 @@ sudo apt-get remove -qq golang && sudo rm -rf /usr/local/go &&
 wget -q -O /tmp/golang.tgz https://dl.google.com/go/go1.11.linux-amd64.tar.gz &&
 sudo tar -C /usr/local -xzf /tmp/golang.tgz
 
-
 # docker-compose
 sudo rm -f /usr/local/bin/docker-compose
 sudo curl -s -L "https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
@@ -34,3 +33,5 @@ sudo add-apt-repository \
 sudo apt-get update -qq
 sudo apt-get install -qq docker-ce
 
+# Install ghr
+go get -u github.com/tcnksm/ghr

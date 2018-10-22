@@ -204,6 +204,11 @@ jobs:
           path: /artifacts
           name: Artifact storage
 
+      - run:
+          command: ghr -draft -u $GITHUB_USERNAME -t $GITHUB_TOKEN -n $VERSION $VERSION $ARTIFACTS
+          name: Upload artifacts to GitHub
+
+
 workflows:
   version: 2
   normal_build_and_test:
