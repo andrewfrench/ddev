@@ -52,5 +52,5 @@ for item in *.*; do
   sha256sum $item > $item.sha256.txt
 done
 
-printenv
-/home/circleci/go/bin/ghr -draft -r $GITHUB_REPOSITORY -u $GITHUB_USERNAME -t $GITHUB_TOKEN -n $VERSION $VERSION $ARTIFACTS
+# Upload artifacts to Github release
+/home/circleci/go/bin/ghr -draft -prerelease -r $GITHUB_REPOSITORY -u $GITHUB_USERNAME -t $GITHUB_TOKEN -n $VERSION -b $(cat .circleci/release-notes.md) $VERSION $ARTIFACTS
