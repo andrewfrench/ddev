@@ -204,9 +204,9 @@ jobs:
           path: /artifacts
           name: Artifact storage
 
-      - run:
-          command: /home/circleci/go/bin/ghr -draft -u $GITHUB_USERNAME -t $GITHUB_TOKEN -n $VERSION $VERSION $ARTIFACTS
-          name: Upload artifacts to GitHub
+    #   - run:
+    #       command: /home/circleci/go/bin/ghr -draft -u $GITHUB_USERNAME -t $GITHUB_TOKEN -n $VERSION $VERSION $ARTIFACTS
+    #       name: Upload artifacts to GitHub
 
 
 workflows:
