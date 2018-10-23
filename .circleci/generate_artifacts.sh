@@ -14,8 +14,8 @@ sudo mkdir $ARTIFACTS && sudo chmod 777 $ARTIFACTS
 export VERSION=$(git describe --tags --always --dirty)
 
 # Build containers 
-$CONTAINERS=(`ls ${BASE_DIR}/containers`)
-for $CONTAINER in "${CONTAINERS[@]}";
+CONTAINERS=($(ls ${BASE_DIR}/containers));
+for CONTAINER in "${CONTAINERS[@]}";
 do
   pushd ${BASE_DIR}/containers/${CONTAINER};
   make push VERISON=${VERSION};
