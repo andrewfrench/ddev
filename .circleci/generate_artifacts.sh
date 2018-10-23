@@ -13,16 +13,25 @@ BASE_DIR=$PWD
 sudo mkdir $ARTIFACTS && sudo chmod 777 $ARTIFACTS
 export VERSION=$(git describe --tags --always --dirty)
 
+# Build containers 
+$CONTAINER_DIRS=$(ls ${BASE_DIR}/containers)
+for $CONTAINER_DIR in "${CONTAINER_DIRS[@]}";
+do
+  pushd ${BASE_DIR}/containers/${CONTAINER_DIR};
+  make push VERISON=${VERSION};
+  popd
+done 
+
 # Make sure we have all our docker images, and save them in a tarball
-$BASE_DIR/bin/linux/ddev version | awk '/drud\// {print $2;}' >/tmp/images.txt
-for item in $(cat /tmp/images.txt); do
-  docker pull $item
-done
-docker save -o $ARTIFACTS/ddev_docker_images.$VERSION.tar $(cat /tmp/images.txt)
-gzip --keep $ARTIFACTS/ddev_docker_images.$VERSION.tar
-if [ ! -z "$BUILD_XZ" ] ; then
-    xz $ARTIFACTS/ddev_docker_images.$VERSION.tar
-fi
+# $BASE_DIR/bin/linux/ddev version | awk '/drud\// {print $2;}' >/tmp/images.txt
+# for item in $(cat /tmp/images.txt); do
+#   docker pull $item
+# done
+# docker save -o $ARTIFACTS/ddev_docker_images.$VERSION.tar $(cat /tmp/images.txt)
+# gzip --keep $ARTIFACTS/ddev_docker_images.$VERSION.tar
+# if [ ! -z "$BUILD_XZ" ] ; then
+#     xz $ARTIFACTS/ddev_docker_images.$VERSION.tar
+# fi
 
 # Generate and place extra items like autocomplete
 bin/linux/ddev_gen_autocomplete
