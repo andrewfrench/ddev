@@ -204,9 +204,18 @@ jobs:
           path: /artifacts
           name: Artifact storage
 
-    #   - run:
-    #       command: /home/circleci/go/bin/ghr -draft -u $GITHUB_USERNAME -t $GITHUB_TOKEN -n $VERSION $VERSION $ARTIFACTS
-    #       name: Upload artifacts to GitHub
+      - run:
+          command: |
+            /home/circleci/go/bin/ghr \
+            -draft \
+            -prerelease \
+            -r $GITHUB_REPOSITORY \
+            -u $GITHUB_USERNAME \
+            -t $GITHUB_TOKEN \
+            -n $VERSION \
+            -b "$(cat ${BASE_DIR}/release-notes.md)" \
+            $VERSION $ARTIFACTS
+          name: Upload artifacts to GitHub release page
 
 
 workflows:

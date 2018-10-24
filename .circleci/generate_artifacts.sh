@@ -13,32 +13,16 @@ BASE_DIR=$PWD
 sudo mkdir $ARTIFACTS && sudo chmod 777 $ARTIFACTS
 export VERSION=$(git describe --tags --always --dirty)
 
-# Build containers 
-CONTAINERS=($(ls ${BASE_DIR}/containers));
-for CONTAINER in "${CONTAINERS[@]}";
-do
-  pushd ${BASE_DIR}/containers/${CONTAINER};
-  make push VERISON=${VERSION};
-  popd
-done 
-
-# Create container artifacts
-docker save -o ${ARTIFACTS}/ddev_docker_images.${VERSION}.tar ${CONTAINERS}
-gzip --keep ${ARTIFACTS}/ddev_docker_images.${VERSION}.tar
-if [ ! -z "${BUILD_XZ}"] ; then
-  xz ${ARTIFACTS}/ddev_docker_imagez.${VERSION}.tar
-fi
-
 # Make sure we have all our docker images, and save them in a tarball
-# $BASE_DIR/bin/linux/ddev version | awk '/drud\// {print $2;}' >/tmp/images.txt
-# for item in $(cat /tmp/images.txt); do
-#   docker pull $item
-# done
-# docker save -o $ARTIFACTS/ddev_docker_images.$VERSION.tar $(cat /tmp/images.txt)
-# gzip --keep $ARTIFACTS/ddev_docker_images.$VERSION.tar
-# if [ ! -z "$BUILD_XZ" ] ; then
-#     xz $ARTIFACTS/ddev_docker_images.$VERSION.tar
-# fi
+$BASE_DIR/bin/linux/ddev version | awk '/drud\// {print $2;}' >/tmp/images.txt
+for item in $(cat /tmp/images.txt); do
+  docker pull $item
+done
+docker save -o $ARTIFACTS/ddev_docker_images.$VERSION.tar $(cat /tmp/images.txt)
+gzip --keep $ARTIFACTS/ddev_docker_images.$VERSION.tar
+if [ ! -z "$BUILD_XZ" ] ; then
+    xz $ARTIFACTS/ddev_docker_images.$VERSION.tar
+fi
 
 # Generate and place extra items like autocomplete
 bin/linux/ddev_gen_autocomplete
@@ -67,14 +51,3 @@ cd $ARTIFACTS
 for item in *.*; do
   sha256sum $item > $item.sha256.txt
 done
-
-# Upload artifacts to Github release
-/home/circleci/go/bin/ghr \
-  -draft \
-  -prerelease \
-  -r $GITHUB_REPOSITORY \
-  -u $GITHUB_USERNAME \
-  -t $GITHUB_TOKEN \
-  -n $VERSION \
-  -b "$(cat ${BASE_DIR}/.circleci/release-notes.md)" \
-  $VERSION $ARTIFACTS
