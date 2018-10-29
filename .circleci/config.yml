@@ -31,6 +31,9 @@ jobs:
     steps:
     - attach_workspace:
         at: ~/
+    - run:
+        command: source ./.circleci/.publicenv
+        name: Expose public environment variables
     # Run the built-in ddev tests with the executables just built.
     - run:
         command: ./.circleci/circle_vm_setup.sh
@@ -54,6 +57,9 @@ jobs:
     - attach_workspace:
         at: ~/
     - run:
+        command: source ./.circleci/.publicenv
+        name: Expose public environment variables
+    - run:
         command: ./.circleci/circle_vm_setup.sh
         name: Circle VM setup - tools, docker, golang
         # Now build using the regular ddev-only technique - this results in a fully clean set of executables.
@@ -76,6 +82,9 @@ jobs:
     - attach_workspace:
         at: ~/
     - run:
+        command: source ./.circleci/.publicenv
+        run: Expose public environment variables
+    - run:
         command: ./.circleci/circle_vm_setup.sh
         name: Circle VM setup - tools, docker, golang
     - run:
@@ -93,6 +102,9 @@ jobs:
     steps:
     - attach_workspace:
         at: ~/
+    - run:
+        command: ./.circleci/.publicenv
+        name: Expose public environment variables
     # Run the built-in ddev tests with the executables just built.
     - run:
         command: ./.circleci/circle_vm_setup.sh
@@ -112,6 +124,9 @@ jobs:
     - attach_workspace:
         at: ~/
     - run:
+        command: source ./.circleci/.publicenv
+        name: Expose public environment variables
+    - run:
         command: ./.circleci/generate_artifacts.sh $ARTIFACTS
         name: tar/zip up artifacts and make hashes
         no_output_timeout: "40m"
@@ -130,6 +145,10 @@ jobs:
       ARTIFACTS: /artifacts
     steps:
       - checkout
+
+      - run:
+          command: source ./.circleci/.publicenv
+          name: Expose public environment variables
 
       - run:
           command: ./.circleci/circle_vm_setup.sh
@@ -180,6 +199,10 @@ jobs:
       - run: mkdir -p ~/go/{lib,pkg,src/github.com/drud/ddev}
 
       - checkout
+
+      - run:
+          command: source ./.circleci/.publicenv
+          name: Expose public environment variables
 
       - run:
           command: ./.circleci/circle_vm_setup.sh
