@@ -31,9 +31,6 @@ jobs:
     steps:
     - attach_workspace:
         at: ~/
-    - run:
-        command: source ./.circleci/.publicenv
-        name: Expose public environment variables
     # Run the built-in ddev tests with the executables just built.
     - run:
         command: ./.circleci/circle_vm_setup.sh
@@ -57,9 +54,6 @@ jobs:
     - attach_workspace:
         at: ~/
     - run:
-        command: source ./.circleci/.publicenv
-        name: Expose public environment variables
-    - run:
         command: ./.circleci/circle_vm_setup.sh
         name: Circle VM setup - tools, docker, golang
         # Now build using the regular ddev-only technique - this results in a fully clean set of executables.
@@ -82,9 +76,6 @@ jobs:
     - attach_workspace:
         at: ~/
     - run:
-        command: source ./.circleci/.publicenv
-        run: Expose public environment variables
-    - run:
         command: ./.circleci/circle_vm_setup.sh
         name: Circle VM setup - tools, docker, golang
     - run:
@@ -102,9 +93,6 @@ jobs:
     steps:
     - attach_workspace:
         at: ~/
-    - run:
-        command: ./.circleci/.publicenv
-        name: Expose public environment variables
     # Run the built-in ddev tests with the executables just built.
     - run:
         command: ./.circleci/circle_vm_setup.sh
@@ -124,9 +112,6 @@ jobs:
     - attach_workspace:
         at: ~/
     - run:
-        command: source ./.circleci/.publicenv
-        name: Expose public environment variables
-    - run:
         command: ./.circleci/generate_artifacts.sh $ARTIFACTS
         name: tar/zip up artifacts and make hashes
         no_output_timeout: "40m"
@@ -145,10 +130,6 @@ jobs:
       ARTIFACTS: /artifacts
     steps:
       - checkout
-
-      - run:
-          command: source ./.circleci/.publicenv
-          name: Expose public environment variables
 
       - run:
           command: ./.circleci/circle_vm_setup.sh
@@ -174,7 +155,7 @@ jobs:
 
       # Run the built-in ddev tests with the clean binaries just built.
       - run:
-          command: make -s test
+          command: make -s test gometalinter
           name: ddev tests, with normal clean ddev binaries (normal image tags)
           no_output_timeout: "20m"
 
@@ -201,10 +182,6 @@ jobs:
       - checkout
 
       - run:
-          command: source ./.circleci/.publicenv
-          name: Expose public environment variables
-
-      - run:
           command: ./.circleci/circle_vm_setup.sh
           name: TAG BUILD Circle VM setup - tools, docker, golang
 
@@ -229,14 +206,14 @@ jobs:
 
       - run:
           command: |
-            /home/circleci/ghr \
+            /home/circleci/go/bin/ghr \
             -draft \
-            -prerelease \
+            -recreate \
             -r $GITHUB_REPOSITORY \
             -u $GITHUB_USERNAME \
             -t $GITHUB_TOKEN \
             -n $(cat ./.version) \
-            -b "$(cat ./.github/RELEASE_NOTES_TEMPLATE.md)" \
+            -b "$(cat ./release-notes.md)" \
             $(cat ./.version) $ARTIFACTS
           name: Upload artifacts to GitHub release page
 
