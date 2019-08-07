@@ -55,28 +55,39 @@ ddev stop --all --stop-ssh-agent`,
 		}
 
 		// Iterate through the list of projects built above, removing each one.
+		ch := make(chan bool, len(projects))
 		for _, project := range projects {
-			if project.SiteStatus() == ddevapp.SiteStopped {
-				util.Success("Project %s is already stopped.", project.GetName())
-			}
+			go func(project *ddevapp.DdevApp) {
+				util.Warning("Stopping %s", project.Name)
+				if project.SiteStatus() == ddevapp.SiteStopped {
+					util.Success("Project %s is already stopped.", project.GetName())
+				}
 
-			// We do the snapshot if either --snapshot or --remove-data UNLESS omit-snapshot is set
-			doSnapshot := (createSnapshot || removeData) && !omitSnapshot
-			if err := project.Stop(removeData, doSnapshot); err != nil {
-				util.Failed("Failed to stop project %s: \n%v", project.GetName(), err)
-			}
-			if unlist {
-				project.RemoveGlobalProjectInfo()
-			}
+				// We do the snapshot if either --snapshot or --remove-data UNLESS omit-snapshot is set
+				doSnapshot := (createSnapshot || removeData) && !omitSnapshot
+				if err := project.Stop(removeData, doSnapshot); err != nil {
+					util.Failed("Failed to stop project %s: \n%v", project.GetName(), err)
+				}
+				if unlist {
+					project.RemoveGlobalProjectInfo()
+				}
 
-			util.Success("Project %s has been stopped.", project.GetName())
+				util.Success("Project %s has been stopped.", project.GetName())
+
+				if stopSSHAgent {
+					if err := ddevapp.RemoveSSHAgentContainer(); err != nil {
+						util.Error("Failed to remove ddev-ssh-agent: %v", err)
+					}
+				}
+
+				ch <- true
+			}(project)
 		}
 
-		if stopSSHAgent {
-			if err := ddevapp.RemoveSSHAgentContainer(); err != nil {
-				util.Error("Failed to remove ddev-ssh-agent: %v", err)
-			}
+		for i := 0; i < len(projects); i++ {
+			<-ch
 		}
+
 	},
 }
 
