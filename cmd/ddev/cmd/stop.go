@@ -55,7 +55,7 @@ ddev stop --all --stop-ssh-agent`,
 		}
 
 		// Iterate through the list of projects built above, removing each one.
-		ch := make(chan bool, len(projects))
+		doneCh := make(chan bool, len(projects))
 		for _, project := range projects {
 			go func(project *ddevapp.DdevApp) {
 				util.Warning("Stopping %s", project.Name)
@@ -80,12 +80,13 @@ ddev stop --all --stop-ssh-agent`,
 					}
 				}
 
-				ch <- true
+				doneCh <- true
 			}(project)
 		}
 
+		// This will block to wait for all stop channels to complete
 		for i := 0; i < len(projects); i++ {
-			<-ch
+			<-doneCh
 		}
 
 	},

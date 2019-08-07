@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"github.com/drud/ddev/pkg/ddevapp"
 	"strings"
+
+	"github.com/drud/ddev/pkg/ddevapp"
 
 	"github.com/drud/ddev/pkg/dockerutil"
 	"github.com/drud/ddev/pkg/output"
@@ -36,27 +37,39 @@ any directory by running 'ddev start projectname [projectname ...]'`,
 			util.Failed(err.Error())
 		}
 
+		done := make(chan bool, len(projects))
 		for _, project := range projects {
-			if err := ddevapp.CheckForMissingProjectFiles(project); err != nil {
-				util.Failed("Failed to start %s: %v", project.GetName(), err)
-			}
+			go func(project *ddevapp.DdevApp) {
+				util.Warning("Request start for %s", project.Name)
+				if err := ddevapp.CheckForMissingProjectFiles(project); err != nil {
+					util.Failed("Failed to start %s: %v", project.GetName(), err)
+				}
 
-			output.UserOut.Printf("Starting %s...", project.GetName())
-			if err := project.Start(); err != nil {
-				util.Failed("Failed to start %s: %v", project.GetName(), err)
-				continue
-			}
+				output.UserOut.Printf("Starting %s...", project.GetName())
+				if err := project.Start(); err != nil {
+					util.Failed("Failed to start %s: %v", project.GetName(), err)
+					done <- true
+					return
+				}
 
-			util.Success("Successfully started %s", project.GetName())
-			httpURLs, urlList, _ := project.GetAllURLs()
-			if ddevapp.GetCAROOT() == "" {
-				urlList = httpURLs
-			}
+				util.Success("Successfully started %s", project.GetName())
+				httpURLs, urlList, _ := project.GetAllURLs()
+				if ddevapp.GetCAROOT() == "" {
+					urlList = httpURLs
+				}
 
-			util.Success("Project can be reached at %s", strings.Join(urlList, " "))
-			if project.WebcacheEnabled {
-				util.Warning("All contents were copied to fast docker filesystem,\nbut bidirectional sync operation may not be fully functional for a few minutes.")
-			}
+				util.Success("Project can be reached at %s", strings.Join(urlList, " "))
+				if project.WebcacheEnabled {
+					util.Warning("All contents were copied to fast docker filesystem,\nbut bidirectional sync operation may not be fully functional for a few minutes.")
+				}
+
+				done <- true
+			}(project)
+		}
+
+		// This will block to wait for all start channels to complete
+		for i := 0; i <= len(projects); i++ {
+			<-done
 		}
 	},
 }

@@ -1,0 +1,5 @@
+old ddev stop --all: 9 projects; 61.216s
+new ddev stop --all: 9 projects; 28.855s
+
+old ddev start --all: 9 projects; 104.963s
+new ddev start --all: 9 projects; broken
